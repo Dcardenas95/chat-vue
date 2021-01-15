@@ -13,15 +13,34 @@
 </template>
 
 <script>
-import { fb ,auth } from '../firebase'
+import { fb ,auth,db } from '../firebase'
 export default {
-  name: "Home",
+  name: "RoomsView",
+
+  async created() {
+    // Set
+    const user = { name: "David cardenas", city: "Bucaramanga", country: "Colombia" };
+    await db
+      .collection("users")
+      .doc("persona")
+      .set(user, { merge: true });
+    // Add
+    //await db.collection("users").add(user);
+    // Get new ID and then add
+    const newDocRef = db.collection("users").doc();
+    const newId = newDocRef.id;
+    await newDocRef.set({ name: "Guizmo", created: Date.now(), id: newId });
+
+  },
+
   data() {
     return {
       user: null
     };
   },
+
   methods: {
+    
     async doLogin() {
       try {
         const provider = new fb.auth.GoogleAuthProvider();
@@ -32,6 +51,7 @@ export default {
         console.error(error.message);
       }
     },
+
     async doLogout() {
       try {
         await auth.signOut();
@@ -39,7 +59,9 @@ export default {
       } catch (error) {
         console.error(error.message);
       }
-    }
+    },
+
   },
+  
 };
 </script>

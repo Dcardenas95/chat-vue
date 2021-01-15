@@ -16,6 +16,7 @@
           aria-label="menu"
           aria-expanded="false"
           data-target="navbar"
+          ref="burger"
         
         >
           <span aria-hidden="true"></span>
@@ -24,48 +25,34 @@
         </a>
       </div>
 
-      <div id="navbarBasicExample" class="navbar-menu">
+      <div id="navbarBasicExample" class="navbar-menu" ref="navBar">
         <div class="navbar-start">
-          <a class="navbar-item">
-            Home
-          </a>
-
-          <a class="navbar-item">
-            Documentation
-          </a>
-
-          <div class="navbar-item has-dropdown is-hoverable">
-            <a class="navbar-link">
-              More
+          <router-link to="">
+            <a class="navbar-item">
+              Home
             </a>
-
-            <div class="navbar-dropdown">
-              <a class="navbar-item">
-                About
-              </a>
-              <a class="navbar-item">
-                Jobs
-              </a>
-              <a class="navbar-item">
-                Contact
-              </a>
-              <hr class="navbar-divider" />
-              <a class="navbar-item">
-                Report an issue
-              </a>
-            </div>
-          </div>
+          </router-link>
+          <router-link to="">
+            <a class="navbar-item">
+              Crear sala
+            </a>
+          </router-link>
         </div>
 
         <div class="navbar-end">
           <div class="navbar-item">
             <div class="buttons">
-              <a class="button is-primary">
-                <strong>Sign up</strong>
-              </a>
-              <a class="button is-light">
-                Log in
-              </a>
+              <template v-if="user">
+              <router-link
+                class="button is-primary"
+                :to="{ name: 'profile' }"
+                >
+                <strong>Perfil</strong>
+              </router-link>
+                <a class="button is-light" @click="doLogout">
+                  Cerrar Sesion
+                </a>
+              </template>
             </div>
           </div>
         </div> 
@@ -76,7 +63,7 @@
 
 
 <script>
-
+import { mapState } from "vuex";
 export default {
   name: "NavBarComponent",
   mounted() {
@@ -96,7 +83,21 @@ export default {
       this.burger.classList.toggle("is-active");
       this.navBar.classList.toggle("is-active");
     },
-    doLogout() {}
+
+    async doLogout() {
+      try {
+        await this.$store.dispatch("user/doLogout");
+        this.$router.push({ name: "auth" });
+        this.$toast.success("Se ha cerrado sesion");
+      } catch (error) {
+        console.error(error.message);
+      }
+    }
+
+  },
+
+  computed: {
+    ...mapState("user", ["user"])
   }
 };
 
